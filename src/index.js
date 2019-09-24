@@ -1,3 +1,6 @@
+// use browserify index.js -o bundle.js to generate JS
+// use global. for function to be accessible from index.html
+
 const Iota = require('@iota/core')
 const Converter = require('@iota/converter')
 
