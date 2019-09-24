@@ -1,5 +1,8 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (global){
+// use browserify index.js -o bundle.js to generate JS
+// use global. for function to be accessible from index.html
+
 const Iota = require('@iota/core')
 const Converter = require('@iota/converter')
 
@@ -36,18 +39,20 @@ global.sendMessage = async () => {
 }
 
 const messages = {}
-const findMessages = () => {
-    iota.findTransactionObjects(query)
-        .then(transactions => {
-            transactions.map(transaction => {
-                if (typeof messages[transaction.hash] == 'undefined') {
-                    const msg = Converter.trytesToAscii(transaction.signatureMessageFragment.replace(/9*$/, ''))
-                    messages[transaction.hash] = msg
-                    document.getElementById("show").innerHTML += "<p>" + msg + "</p>"
-                }
-            })
+
+const findMessages = async () => {
+    try {
+        const transactions = await iota.findTransactionObjects(query)
+        transactions.map(transaction => {
+            if (typeof messages[transaction.hash] == 'undefined') {
+                const msg = Converter.trytesToAscii(transaction.signatureMessageFragment.replace(/9*$/, ''))
+                messages[transaction.hash] = msg
+                document.getElementById("show").innerHTML += "<p>" + msg + "</p>"
+            }
         })
-        .catch(err => console.log(err))
+    } catch (err) {
+        console.error(err.message)
+    }
 }
 
 setInterval(() => findMessages(), 1000)

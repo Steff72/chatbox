@@ -37,18 +37,20 @@ global.sendMessage = async () => {
 }
 
 const messages = {}
-const findMessages = () => {
-    iota.findTransactionObjects(query)
-        .then(transactions => {
-            transactions.map(transaction => {
-                if (typeof messages[transaction.hash] == 'undefined') {
-                    const msg = Converter.trytesToAscii(transaction.signatureMessageFragment.replace(/9*$/, ''))
-                    messages[transaction.hash] = msg
-                    document.getElementById("show").innerHTML += "<p>" + msg + "</p>"
-                }
-            })
+
+const findMessages = async () => {
+    try {
+        const transactions = await iota.findTransactionObjects(query)
+        transactions.map(transaction => {
+            if (typeof messages[transaction.hash] == 'undefined') {
+                const msg = Converter.trytesToAscii(transaction.signatureMessageFragment.replace(/9*$/, ''))
+                messages[transaction.hash] = msg
+                document.getElementById("show").innerHTML += "<p>" + msg + "</p>"
+            }
         })
-        .catch(err => console.log(err))
+    } catch (err) {
+        console.error(err.message)
+    }
 }
 
 setInterval(() => findMessages(), 1000)
